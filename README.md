@@ -1,9 +1,9 @@
-#Web Script Editor - A Live HTML, CSS, and JS Editor
+# Web Script Editor - A Live HTML, CSS, and JS Editor
 
-#Overview:
+## Overview:
 The Web Script Editor is a powerful tool that allows users to write HTML, CSS, and JavaScript code and see the results in real-time in their browser. It is designed to provide an interactive coding experience with live reload functionality.
 
-#Features:
+## Features:
 1. **Live Editing**: Write HTML, CSS, and JavaScript and see the changes live in your browser. Enjoy real-time updates as you code.
 2. **JSFiddle Integration**: Send and export your project directly to JSFiddle for further experimentation and sharing.
 3. **Automatic Saving**: Utilize the buttons to save your project automatically as an HTML file for downloading and future reference.
@@ -11,8 +11,7 @@ The Web Script Editor is a powerful tool that allows users to write HTML, CSS, a
 5. **Output Rendering**: The tool fetches the output and renders it on the page as HTML, similar to how Codex's JavaScript sandbox functioned in OpenAI's original version.
 6. **Inspired by OpenAI's Codex**: This tool is based on the JavaScript sandbox by OpenAI Codex. Since OpenAI shut down their version earlier this year, this tool was created as a code editor strictly for HTML, with recent updates adding full-on JavaScript sandbox-like features.
 
-#Ongoing Work:
+## Ongoing Work:
 This project is a work in progress, with continuous updates and enhancements being made to improve its functionality and usability. It represents a dedicated effort to provide a seamless coding experience for web development enthusiasts.
 
-##Enjoy your coding journey with the Web Script Editor!
-
+### Enjoy your coding journey with the Web Script Editor!
