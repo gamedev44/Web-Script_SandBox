@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Web-Script SandBox.exe</title>
+<style>
+    body {
+      margin: 0;
+      padding: 20px;
+      zoom: 50%; /* Set the default zoom level to 50% */
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      height: calc(200vh - 400px);
+      margin-bottom: 20px;
+    }
+
+    .header9999 {
+      color: green;
+      font-size: xx-large;
+    }
+
+    .code-input {
+      flex: 1;
+      border: 2px solid green;
+      resize: none;
+      padding: 10px;
+      font-family: monospace;
+      font-size: xx-large;
+    }
+    .output {
+      flex: 1;
+      border: 2px solid purple;
+      resize: none;
+      padding: 10px;
+      font-family: monospace;
+      font-size: x-large;
+    }
+
+    .code-input.error,
+    .output.error {
+      border-color: red;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    button {
+      padding: 10px 20px;
+      width: 200px;
+      height: 100px;
+      font-size: x-large;
+    }
+
+
+    .drag-handle {
+      width: 20px;
+      height: 20px;
+      position: absolute;
+      background-image: url('https://icons.veryicon.com/png/o/miscellaneous/cockpit/drag-4.png');
+      background-size: cover;
+      cursor: move;
+    }
+
+    /* Dark mode styles */
+    body.dark-mode {
+      color: #eee;
+      background-color: #333;
+    }
+
+    body.dark-mode button {
+      background-color: #555;
+      color: #eee;
+    }
+
+    body.dark-mode .container {
+      border-color: #555;
+    }
+
+    body.dark-mode .code-input,
+    body.dark-mode .output {
+      background-color: #222;
+      color: #eee;
+    }
+
+    body.dark-mode .code-input.error,
+    body.dark-mode .output.error {
+      border-color: #ff5555;
+    }
+    label {
+    font-size: x-large;
+  }
+  </style>
+</head>
+<body>
+<header9999 class="header9999">|Web-Script SandBox v2 /WIP|</header9999>
+<div class="container">
+<textarea class="code-input" cols="50" id="codeInput" rows="5"></textarea><textarea class_="code-input" cols="50" id="gpt4Input" rows="5" style="display: none;"></textarea>
+<div class="output" id="sandbox"></div><textarea class_="output" id="gpt4Output" placeholder="Generated code will appear here..." readonly="True" style="display: none;"></textarea>
+</div>
+<div class="button-container">
+<button onclick="startListening()">Start live-code</button>
+<button onclick="stopListening()">Stop live-code</button>
+<button id="runButton" onclick="runCode()">Run</button>
+<button onclick="saveInputText()">Save Input as Text</button>
+<button onclick="saveOutputHTML()">Save Output as HTML</button>
+<button onclick="sendToJSFiddle()">Send to JSFiddle</button>
+<button onclick="toggleGPT4()">Toggle GPT-4</button>
+<button onclick="changeTheme()">Theme</button>
+<label><input onclick="toggleDarkMode()" type="checkbox"/>Dark Mode</label>
+</div>
+<form action="https://jsfiddle.net/api/post/library/pure/" id="jsfiddleForm" method="post" target="_blank">
+<input name="title" type="hidden" value="Code Sandbox"/>
+<input id="jsfiddleHtml" name="html" type="hidden"/>
+<input name="css" type="hidden" value=""/>
+<input name="js" type="hidden" value=""/>
+</form>
+<script>
+
+    var isListening = false;
+    var inputInterval;
+    var bitoFrameContainer = document.getElementById('bitoFrameContainer');
+    var bitoFrame = document.getElementById('bitoFrame');
+    var dragHandle = document.querySelector('.drag-handle');
+
+    function runCode() {
+      var codeInput = document.getElementById('codeInput');
+      var sandbox = document.getElementById('sandbox');
+
+      try {
+        sandbox.innerHTML = codeInput.value;
+        codeInput.classList.remove('error');
+        sandbox.classList.remove('error');
+      } catch (error) {
+        console.error(error);
+        codeInput.classList.add('error');
+        sandbox.classList.add('error');
+      }
+    }
+
+    function startListening() {
+      if (isListening) return;
+
+      isListening = true;
+
+      inputInterval = setInterval(function () {
+        runCode();
+      }, 1000);
+    }
+
+    function stopListening() {
+      isListening = false;
+      clearInterval(inputInterval);
+    }
+
+    function saveInputText() {
+      var codeInput = document.getElementById('codeInput').value;
+      var element = document.createElement('a');
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(codeInput));
+      element.setAttribute('download', 'input.txt');
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    }
+
+    function saveOutputHTML() {
+      var output = document.getElementById('sandbox').innerHTML;
+      var element = document.createElement('a');
+      element.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURIComponent(output));
+      element.setAttribute('download', 'output.html');
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    }
+
+    function sendToJSFiddle() {
+      var codeInput = document.getElementById('codeInput').value;
+      document.getElementById('jsfiddleHtml').value = codeInput;
+      document.getElementById('jsfiddleForm').submit();
+    }
+
+    function sendToJSFiddle() {
+  var output = document.getElementById('sandbox').innerHTML;
+  var codeInput = document.getElementById('codeInput').value;
+
+  if (output.trim() === '') {
+    document.getElementById('jsfiddleHtml').value = codeInput;
+  } else {
+    document.getElementById('jsfiddleHtml').value = output;
+  }
+
+  document.getElementById('jsfiddleForm').submit();
+}
+
+    function startDrag(event) {
+  event.preventDefault();
+
+  document.onmousemove = function (event) {
+    if (event.buttons !== 1) return; // Only drag when the left mouse button is held
+
+    var x = event.clientX - offsetX;
+    var y = event.clientY - offsetY;
+
+  };
+
+  document.onmouseup = function () {
+    document.onmousemove = null;
+    document.onmouseup = null;
+  };
+}
+
+function changeTheme() {
+  var imageUrl = prompt("Try this theme https://gcdnb.pbrd.co/images/TDIkPmbJugHn.jpg?o=1 Now Otherwise Create and upload & or Enter the URL of the background image to change the theme:");
+  if (imageUrl) {
+    document.body.style.backgroundImage = 'url(' + imageUrl + ')';
+  } else {
+    document.body.style.backgroundImage = 'url(https://gcdnb.pbrd.co/images/TDIkPmbJugHn.jpg?o=1)';
+  }
+}
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+    //-This Code Sandbox is a text editor and interpreter made to replace javascript sandbox once and for alL.
+    // HOPE YOU ENJOY THIS PROGRAM AND FEEL FREE TO CONTACT ME VIA DISCORD REGARDING USING ANY OF MY CODE FOR OTHER PURPOSES OUTSIED ITS ALREADY FOUND USAGE...
+    // THANKYOU AND HAVE A NICE DAY.
+
+    //THIS TOOL IS BROUGHT TO YOU BY    Indie_Unlimited @discord     invite link here : (     https://discord.gg/M8TcAmbJgS     )
+
+  
+
+
+// Function to call GPT-4 for code generation
+function callGPT4(inputText, callback) {
+
+  // Define the endpoint URL for GPT-4
+const endpointUrl = 'https://api.openai.com/v1/engines/davinci-codex/completions';
+
+  // Prepare the data to be sent to GPT-4
+  const data = {
+    prompt: inputText,
+    max_tokens: 100
+  };
+
+  // Make the API request
+  fetch(endpointUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer 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' // valid API key - model still needs html css and js tag finetuning...
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(data => {
+    // Handle the response and call the callback with the generated code
+    const generatedCode = data.choices[0].text;
+    callback(generatedCode);
+  })
+  .catch(error => {
+    console.error('Error calling GPT-4:', error);
+  });
+}
+
+
+
+function toggleGPT4() {
+  var codeInput = document.getElementById('codeInput');
+  var sandbox = document.getElementById('sandbox');
+  var gpt4Input = document.getElementById('gpt4Input');
+  var gpt4Output = document.getElementById('gpt4Output');
+  var runButton = document.getElementById('runButton');
+  if (gpt4Input.style.display === 'none') {
+    gpt4Input.style.display = 'block';
+    gpt4Output.style.display = 'block';
+    codeInput.style.display = 'none';
+    sandbox.style.display = 'none';
+    runButton.innerHTML = 'Submit Request';
+    runButton.onclick = function() {
+      var inputText = document.getElementById('gpt4Input').value;
+      callGPT4(inputText, function(generatedCode) {
+        document.getElementById('gpt4Output').value = generatedCode;
+      });
+    };
+  } else {
+    gpt4Input.style.display = 'none';
+    gpt4Output.style.display = 'none';
+    codeInput.style.display = 'block';
+    sandbox.style.display = 'block';
+    runButton.innerHTML = 'Run';
+    runButton.onclick = function() { runCode(); };
+  }
+}
+
+document.getElementById('gpt4Button').onclick = function() {
+  var inputText = document.getElementById('gpt4Input').value;
+  callGPT4(inputText, function(generatedCode) {
+    document.getElementById('gpt4Output').innerHTML = generatedCode;
+  });
+};
+
+function toggleGPT4() {
+  var codeInput = document.getElementById('codeInput');
+  var sandbox = document.getElementById('sandbox');
+  var gpt4Input = document.getElementById('gpt4Input');
+  var gpt4Output = document.getElementById('gpt4Output');
+  var runButton = document.getElementById('runButton');
+  if (gpt4Input.style.display === 'none') {
+    gpt4Input.style.display = 'block';
+    gpt4Output.style.display = 'block';
+    codeInput.style.display = 'none';
+    sandbox.style.display = 'none';
+    runButton.innerHTML = 'Submit Request';
+    runButton.onclick = function() {
+      var inputText = document.getElementById('gpt4Input').value;
+      callGPT4(inputText, function(generatedCode) {
+        document.getElementById('gpt4Output').value = generatedCode;
+      });
+    };
+  } else {
+    gpt4Input.style.display = 'none';
+    gpt4Output.style.display = 'none';
+    codeInput.style.display = 'block';
+    sandbox.style.display = 'block';
+    runButton.innerHTML = 'Run';
+    runButton.onclick = function() { runCode(); };
+  }
+}
+</script>
+</body>
+</html>

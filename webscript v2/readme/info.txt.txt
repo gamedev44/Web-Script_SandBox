@@ -1,0 +1,3 @@
+to know more about the original javascript sandbox which this program is based upon then navigate to this link  :
+
+https://blog.scottlogic.com/2021/09/24/how-the-openai-codex-javascript-sandbox-works.html
