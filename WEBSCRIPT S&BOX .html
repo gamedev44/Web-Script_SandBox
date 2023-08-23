@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Web-Script SandBox.exe</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      zoom: 50%; /* Set the default zoom level to 50% */
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      height: calc(200vh - 400px);
+      margin-bottom: 20px;
+    }
+
+    .header9999 {
+      color: green;
+      font-size: xx-large;
+    }
+
+    .code-input {
+      flex: 1;
+      border: 2px solid green;
+      resize: none;
+      padding: 10px;
+      font-family: monospace;
+      font-size: xx-large;
+    }
+    .output {
+      flex: 1;
+      border: 2px solid purple;
+      resize: none;
+      padding: 10px;
+      font-family: monospace;
+      font-size: x-large;
+    }
+
+    .code-input.error,
+    .output.error {
+      border-color: red;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    button {
+      padding: 10px 20px;
+      width: 200px;
+      height: 100px;
+      font-size: x-large;
+    }
+
+    #bitoFrameContainer {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+}
+
+.close-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: red;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+
+    #bitoFrame {
+      width: 700px;
+      height: 500px;
+      border: none;
+    }
+
+    .drag-handle {
+      width: 20px;
+      height: 20px;
+      position: absolute;
+      background-image: url('https://icons.veryicon.com/png/o/miscellaneous/cockpit/drag-4.png');
+      background-size: cover;
+      cursor: move;
+    }
+
+    /* Dark mode styles */
+    body.dark-mode {
+      color: #eee;
+      background-color: #333;
+    }
+
+    body.dark-mode button {
+      background-color: #555;
+      color: #eee;
+    }
+
+    body.dark-mode .container {
+      border-color: #555;
+    }
+
+    body.dark-mode .code-input,
+    body.dark-mode .output {
+      background-color: #222;
+      color: #eee;
+    }
+
+    body.dark-mode .code-input.error,
+    body.dark-mode .output.error {
+      border-color: #ff5555;
+    }
+    label {
+    font-size: x-large;
+  }
+  </style>
+</head>
+<body>
+  <header9999 class="header9999">|Web-Script SandBox v1|</header9999>
+  <div class="container">
+    <textarea id="codeInput" class="code-input" rows="5" cols="50"></textarea>
+    <div id="sandbox" class="output"></div>
+  </div>
+  <div class="button-container">
+    <button onclick="startListening()">Start live-code</button>
+    <button onclick="stopListening()">Stop live-code</button>
+    <button onclick="runCode()">Run</button>
+    <button onclick="saveInputText()">Save Input as Text</button>
+    <button onclick="saveOutputHTML()">Save Output as HTML</button>
+    <button onclick="sendToJSFiddle()">Send to JSFiddle</button>
+    <button onclick="openBitoFrame()">Open Bito AI</button>
+    <button onclick="changeTheme()">Theme</button>
+    <label><input type="checkbox" onclick="toggleDarkMode()">Dark Mode</label>
+  </div>
+
+  <form id="jsfiddleForm" method="post" action="https://jsfiddle.net/api/post/library/pure/" target="_blank">
+    <input type="hidden" name="title" value="Code Sandbox">
+    <input type="hidden" name="html" id="jsfiddleHtml">
+    <input type="hidden" name="css" value="">
+    <input type="hidden" name="js" value="">
+  </form>
+
+  <div id="bitoFrameContainer">
+    <div class="close-button" onclick="closeBitoFrame()">&#10006;</div>
+    <iframe id="bitoFrame"></iframe>
+    <div class="drag-handle" onmousedown="startDrag(event)"></div>
+  </div>  
+
+  <script>
+
+    var isListening = false;
+    var inputInterval;
+    var bitoFrameContainer = document.getElementById('bitoFrameContainer');
+    var bitoFrame = document.getElementById('bitoFrame');
+    var dragHandle = document.querySelector('.drag-handle');
+
+    function runCode() {
+      var codeInput = document.getElementById('codeInput');
+      var sandbox = document.getElementById('sandbox');
+
+      try {
+        sandbox.innerHTML = codeInput.value;
+        codeInput.classList.remove('error');
+        sandbox.classList.remove('error');
+      } catch (error) {
+        console.error(error);
+        codeInput.classList.add('error');
+        sandbox.classList.add('error');
+      }
+    }
+
+    function startListening() {
+      if (isListening) return;
+
+      isListening = true;
+
+      inputInterval = setInterval(function () {
+        runCode();
+      }, 1000);
+    }
+
+    function stopListening() {
+      isListening = false;
+      clearInterval(inputInterval);
+    }
+
+    function saveInputText() {
+      var codeInput = document.getElementById('codeInput').value;
+      var element = document.createElement('a');
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(codeInput));
+      element.setAttribute('download', 'input.txt');
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    }
+
+    function saveOutputHTML() {
+      var output = document.getElementById('sandbox').innerHTML;
+      var element = document.createElement('a');
+      element.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURIComponent(output));
+      element.setAttribute('download', 'output.html');
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    }
+
+    function sendToJSFiddle() {
+      var codeInput = document.getElementById('codeInput').value;
+      document.getElementById('jsfiddleHtml').value = codeInput;
+      document.getElementById('jsfiddleForm').submit();
+    }
+
+    function sendToJSFiddle() {
+  var output = document.getElementById('sandbox').innerHTML;
+  var codeInput = document.getElementById('codeInput').value;
+
+  if (output.trim() === '') {
+    document.getElementById('jsfiddleHtml').value = codeInput;
+  } else {
+    document.getElementById('jsfiddleHtml').value = output;
+  }
+
+  document.getElementById('jsfiddleForm').submit();
+}
+
+function openBitoFrame() {
+      bitoFrameContainer.style.display = 'block';
+      bitoFrame.src = 'https://alpha.bito.co/bitoai/';
+    }
+     
+    function closeBitoFrame() {
+      bitoFrameContainer.style.display = 'none';
+      bitoFrame.src = '';
+    }
+
+    function startDrag(event) {
+  event.preventDefault();
+
+  var offsetX = event.clientX - bitoFrameContainer.offsetLeft;
+  var offsetY = event.clientY - bitoFrameContainer.offsetTop;
+
+  document.onmousemove = function (event) {
+    if (event.buttons !== 1) return; // Only drag when the left mouse button is held
+
+    var x = event.clientX - offsetX;
+    var y = event.clientY - offsetY;
+
+    bitoFrameContainer.style.left = x + 'px';
+    bitoFrameContainer.style.top = y + 'px';
+  };
+
+  document.onmouseup = function () {
+    document.onmousemove = null;
+    document.onmouseup = null;
+  };
+}
+
+function changeTheme() {
+  var imageUrl = prompt("Try this theme https://gcdnb.pbrd.co/images/TDIkPmbJugHn.jpg?o=1 Now Otherwise Create and upload & or Enter the URL of the background image to change the theme:");
+  if (imageUrl) {
+    document.body.style.backgroundImage = 'url(' + imageUrl + ')';
+  } else {
+    document.body.style.backgroundImage = 'url(https://gcdnb.pbrd.co/images/TDIkPmbJugHn.jpg?o=1)';
+  }
+}
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+    //-This Code Sandbox is a text editor and interpreter made to replace javascript sandbox once and for alL.
+    // HOPE YOU ENJOY THIS PROGRAM AND FEEL FREE TO CONTACT ME VIA DISCORD REGARDING USING ANY OF MY CODE FOR OTHER PURPOSES OUTSIED ITS ALREADY FOUND USAGE...
+    // THANKYOU AND HAVE A NICE DAY.
+
+    //THIS TOOL IS BROUGHT TO YOU BY    Indie_Unlimited @discord     invite link here : (     https://discord.gg/M8TcAmbJgS     )
+
+  </script>
+</body>
+</html>
