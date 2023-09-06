@@ -2,7 +2,7 @@
 
 ## Overview:
 The Web Script Editor is a powerful tool that allows users to write HTML, CSS, and JavaScript code and see the results in real-time in their browser. It is designed to provide an interactive coding experience with live reload functionality.
-it now includes another file called the interpreter aka bat2html converter which allows you to write html pages using the windoes batch scripting language for those that arent familiar with usiong html css and js yet. 
+it now includes another file called the interpreter aka bat2html converter which allows you to write html pages using the windoes batch scripting language for those that arent familiar with using html, css, or javascript yet. 
 ## Features:
 1. **Live Editing**: Write HTML, CSS, and JavaScript and see the changes live in your browser. Enjoy real-time updates as you code.
 2. **JSFiddle Integration**: Send and export your project directly to JSFiddle for further experimentation and sharing.
