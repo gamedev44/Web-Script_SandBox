@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Custom to HTML/CSS/JS Translator</title>
+    <style>
+        #output {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>websript editor</h1>
+
+<!-- Input for custom code -->
+<textarea id="input" rows="10" cols="50"></textarea>
+
+<button id="translateButton">Translate</button>
+
+<!-- Output translated HTML/CSS/JS code -->
+<div id="output"></div>
+
+<script>
+    document.getElementById("translateButton").addEventListener("click", function() {
+        var input = document.getElementById("input").value;
+        var output = "<html>\n<body>\n";
+        
+        // Dictionary for translations
+        var translations = {
+            'echo': '<p>', // Translates to a paragraph
+            'REM': '<!--', // Translates to an HTML comment
+            'h1': '<h1>', // Header tags
+            'P': '<p>', // Paragraphs
+            'url': '<a href="', // Hyperlinks
+            'Img': '<img src="', // Images
+            '#': 'id="', // For id
+            '.': 'class="', // For class
+            'PLUS': '+', // Addition
+            'MINUS': '-', // Subtraction
+            'TIMES': '*', // Multiplication
+            'DIVIDE': '/', // Division
+            'EQUAL': '=' // Equality
+        };
+        
+        // Split the input into lines for processing
+        var lines = input.split("\\n");
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i].trim();
+            
+            // Tokenizing the line by spaces and special characters
+            var words = line.split(/([ .,;#\n])/);
+            
+            for (var j = 0; j < words.length; j++) {
+                var word = words[j];
+                
+                // Translate the word if it's in the dictionary, otherwise keep it as is
+                var translatedWord = translations[word] || word;
+                
+                // Special case for "goto" and ":" (new page)
+                if (word === 'goto') {
+                    var linkText = words.slice(j + 1).join(" ");  // Get the remaining words as the link text
+                    var href = linkText;  // Use the link text as the href
+                    output += `<a href="${href}">${linkText}</a>`;
+                    if (!linkText.endsWith(";")) {
+                        output += ";";
+                    }
+                    output += "\n";
+                    break;  // skip the remaining words for this line
+                } else if (word.startsWith(':')) {
+                    translatedWord += `<div id="${word.slice(1)}">`;
+                }
+                
+                // Append the translated word to the output
+                output += translatedWord;
+            }
+            
+            // Adding a newline after processing each line
+            output += "\\n";
+        }
+        
+        // Close the body and html tags
+        output += "\n</body>\n</html>";
+        
+        // Update the output div
+        document.getElementById("output").innerText = output;
+    });
+    
+    // Listen for opening tags and generate closing tags
+    document.getElementById("input").addEventListener("input", function() {
+        var input = document.getElementById("input");
+        var cursorPosition = input.selectionStart;
+        var inputValue = input.value;
+        
+        // Check if the cursor is in between opening and closing tags
+        var openingTagIndex = inputValue.lastIndexOf("<", cursorPosition);
+        var closingTagIndex = inputValue.lastIndexOf(">", cursorPosition);
+        
+        if (openingTagIndex > -1 && (closingTagIndex === -1 || openingTagIndex > closingTagIndex)) {
+            // Check if there's a closing tag after the opening tag
+            var nextClosingTagIndex = inputValue.indexOf(">", openingTagIndex + 1);
+            
+            // Generate the closing tag only if there's no closing tag within the opening tag
+            if (nextClosingTagIndex === -1 || nextClosingTagIndex > closingTagIndex) {
+                var tagName = inputValue.substring(openingTagIndex + 1, cursorPosition);
+                var closingTag = `</${tagName}>`;
+                input.value = inputValue.slice(0, cursorPosition) + closingTag + inputValue.slice(cursorPosition);
+                
+                // Restore cursor position after generating closing tag
+                input.setSelectionRange(cursorPosition + closingTag.length, cursorPosition + closingTag.length);
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
