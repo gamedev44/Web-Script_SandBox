@@ -1,0 +1,249 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple Block-based Coding</title>
+  <style>
+    body {
+        background-image: none;
+        background-color: rgb(0, 106, 255);
+    }
+    #sections {
+      display: flex;
+      justify-content: space-between;
+    }
+    #blockSelector-html, #blockSelector-css, #blockSelector-js {
+        font-size: large;
+        width: 25%;
+    }
+    #customBlockType {
+        width: 10%;
+
+    }
+
+    #grid-html, #grid-css, #grid-js {
+      width: 300px;
+      height: 400px;
+      border: 2px solid rgb(0, 209, 251);
+      position: relative;
+      color: aliceblue;
+      background-color: rgba(37, 37, 38, 0.652);
+    }
+    .block {
+      width: 100px;
+      height: 30px;
+      position: absolute;
+      cursor: move;
+      color: rgb(255, 242, 0);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    h1 {
+    color: rgb(112, 252, 205);
+    background-color: black;
+
+    }
+    h2 {
+    color: rgb(248, 11, 3);
+    background-color: black;
+
+    }
+    h4 {
+        color: rgb(165, 68, 255);
+        background-color: beige;
+    }
+    .Statement { background-color: rgb(13, 98, 13); }
+    .Condition { background-color: rgb(255, 169, 11); }
+    .Action { background-color: purple; }
+  </style>
+</head>
+<body>
+  <h1>Ice-Code</h1>
+  <h2>Simple Visual Block-based Vertical Flow-Chart Script Creation Tool.  /Work In Progress</h2>
+  <h4>-This tool was Created by: Indie_Unlimited</h4>
+
+  <select id="blockSelector-html">
+    <option value="">--Select an HTML Block--</option>
+    <option value="Title|Statement|html">Title</option>
+    <option value="Body|Statement|html">Body</option>
+  </select>
+  <button onclick="addBlock('html')">Add HTML Block</button>
+  
+
+  <select id="blockSelector-css">
+    <option value="">--Select a CSS Block--</option>
+    <option value="Color|Action|css">Color</option>
+    <option value="Background|Action|css">Background</option>
+  </select>
+  <button onclick="addBlock('css')">Add CSS Block</button>
+
+  <select id="blockSelector-js">
+    <option value="">--Select a JS Block--</option>
+    <option value="OnProgramStart|Statement|js">OnProgramStart</option>
+    <option value="If|Condition|js">If</option>
+    <option value="Else|Condition|js">Else</option>
+    <option value="ThenDo|Statement|js">ThenDo</option>
+    <option value="PrintToConsole|Action|js">PrintToConsole</option>
+  </select>
+  <button onclick="addBlock('js')">Add JS Block</button>
+
+  <select id="customBlockType">
+    <option value="">--Custom Block Type--</option>
+    <option value="html">HTML</option>
+    <option value="css">CSS</option>
+    <option value="js">JavaScript</option>
+  </select>
+  <button onclick="addCustomBlock()">Add Custom Block</button>
+  
+  <div id="sections">
+    <div id="grid-html">HTML</div>
+    <div id="grid-css">CSS</div>
+    <div id="grid-js">JavaScript</div>
+  </div>
+
+  <button onclick="generateCode()">Generate Code</button>
+  <button onclick="previewCode()">Preview Code</button>
+  <button onclick="sendToJSFiddle()">Send to JSFiddle</button>
+  <pre id="codeOutput"></pre>
+  <iframe id="iframePreview" style="width:100%;height:400px;"></iframe>
+
+  <script>
+    let blockId = 0;
+
+    function addBlock(section) {
+  const selected = document.getElementById('blockSelector-' + section).value;
+  if (!selected) return;
+
+  const [selectedBlock, category] = selected.split("|");
+
+  const newBlock = document.createElement('div');
+  newBlock.className = `block ${category}`;
+  newBlock.innerText = selectedBlock;
+  newBlock.id = 'block' + blockId++;
+  newBlock.draggable = true;
+
+  // Determine the last block's position and set the new block's top accordingly
+  const lastBlock = document.querySelector(`#grid-${section} .block:last-child`);
+  if (lastBlock) {
+    const lastBlockTop = lastBlock.offsetTop;
+    newBlock.style.top = (lastBlockTop + 40) + 'px';  // 40 = height of the block + gap
+  } else {
+    newBlock.style.top = '0px';
+  }
+
+  newBlock.addEventListener('dragstart', dragStart);
+  newBlock.addEventListener('dragend', dragEnd);
+  newBlock.addEventListener('contextmenu', openContextMenu);
+
+  document.getElementById('grid-' + section).appendChild(newBlock);
+}
+
+
+    function addCustomBlock() {
+      const customCode = document.getElementById('customCode').value;
+      if (!customCode) return;
+
+      const newBlock = document.createElement('div');
+      newBlock.className = 'block Custom';
+      newBlock.innerText = 'Custom' + customBlockCounter++;
+      newBlock.id = 'block' + blockId++;
+      newBlock.draggable = true;
+      newBlock.title = customCode;
+      newBlock.style.top = lastY[section] + 'px';
+
+    lastY[section] += 40;  // Increment the y-position for the next block
+
+    newBlock.addEventListener('dragstart', dragStart);
+    newBlock.addEventListener('dragend', dragEnd);
+
+    document.getElementById('grid-' + section).appendChild(newBlock);
+  }
+
+    function dragStart(e) {
+      e.dataTransfer.setData("text/plain", e.target.id);
+    }
+
+    function dragEnd(e) {
+      const x = e.clientX - e.target.offsetWidth / 2;
+      const y = e.clientY - e.target.offsetHeight / 2;
+      e.target.style.left = x + 'px';
+      e.target.style.top = y + 'px';
+    }
+
+    function previewCode() {
+      const code = document.getElementById('codeOutput').textContent;
+      const previewFrame = document.getElementById('preview');
+      previewFrame.contentWindow.document.open();
+      previewFrame.contentWindow.document.write(code);
+      previewFrame.contentWindow.document.close();
+    }
+
+    function sendToJSFiddle() {
+      var codeInput = document.getElementById('codeInput').value;
+      document.getElementById('jsfiddleHtml').value = codeInput;
+      document.getElementById('jsfiddleForm').submit();
+    }
+
+    function sendToJSFiddle() {
+  var output = document.getElementById('.block').innerHTML;
+  var codeInput = document.getElementById('codeOutput').value;
+
+  if (output.trim() === '') {
+    document.getElementById('jsfiddleHtml').value = codeInput;
+  } else {
+    document.getElementById('jsfiddleHtml').value = output;
+  }
+
+  document.getElementById('jsfiddleForm').submit();
+}
+
+
+    function openContextMenu(e) {
+      e.preventDefault();
+      const action = prompt("Enter 'delete' to delete or 'edit' to add custom code:");
+      if (action === 'delete') {
+        e.target.remove();
+      } else if (action === 'edit') {
+        const newCode = prompt("Enter your new custom code:");
+        e.target.dataset.customCode = newCode;
+      }
+    }
+
+    function generateCode() {
+      let code = '';
+      const blocks = Array.from(document.querySelectorAll('.block'));
+      blocks.forEach(block => {
+        switch (block.innerText) {
+          case 'OnProgramStart':
+            code += 'function main() {\n';
+            break;
+          case 'If':
+            code += '  if (condition) {\n';
+            break;
+          case 'Else':
+            code += '  } else {\n';
+            break;
+          case 'ThenDo':
+            code += '    // Do something\n';
+            break;
+          case 'PrintToConsole':
+            code += '    console.log("Hello, World!");\n';
+            break;
+          default:
+            if (block.dataset.customCode) {
+              code += '  ' + block.dataset.customCode + '\n';
+            }
+            break;
+        }
+      });
+      code += '}';
+      document.getElementById('codeOutput').textContent = code;
+      document.getElementById('iframePreview').srcdoc = code;
+      document.getElementById('codeOutput').textContent = code;
+    }
+  </script>
+
+</body>
+</html>
