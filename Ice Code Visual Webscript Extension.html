@@ -1,11 +1,12 @@
 
-
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Simple Block-based Coding</title>
+ <head>
+  <title>
+   Simple Block-based Coding
+  </title>
   <style>
-    body {
+   body {
         background-image: none;
         background-color: rgb(0, 106, 255);
     }
@@ -58,59 +59,117 @@
     .Condition { background-color: rgb(255, 169, 11); }
     .Action { background-color: purple; }
   </style>
-</head>
-<body>
-  <h1>Ice-Code</h1>
-  <h2>Simple Visual Block-based Vertical Flow-Chart Script Creation Tool.  /Work In Progress</h2>
-  <h4>-This tool was Created by: Indie_Unlimited</h4>
-
+ </head>
+ <body>
+  <h1>
+   Ice-Code
+  </h1>
+  <h2>
+   Simple Visual Block-based Vertical Flow-Chart Script Creation Tool.  /Work In Progress
+  </h2>
+  <h4>
+   -This tool was Created by: Indie_Unlimited
+  </h4>
   <select id="blockSelector-html">
-    <option value="">--Select an HTML Block--</option>
-    <option value="Title|Statement|html">Title</option>
-    <option value="Body|Statement|html">Body</option>
+   <option value="">
+    --Select an HTML Block--
+   </option>
+   <option value="Title|Statement|html">
+    Title
+   </option>
+   <option value="Body|Statement|html">
+    Body
+   </option>
   </select>
-  <button onclick="addBlock('html')">Add HTML Block</button>
-  
-
+  <button onclick="addBlock('html')">
+   Add HTML Block
+  </button>
   <select id="blockSelector-css">
-    <option value="">--Select a CSS Block--</option>
-    <option value="Color|Action|css">Color</option>
-    <option value="Background|Action|css">Background</option>
+   <option value="">
+    --Select a CSS Block--
+   </option>
+   <option value="Color|Action|css">
+    Color
+   </option>
+   <option value="Background|Action|css">
+    Background
+   </option>
   </select>
-  <button onclick="addBlock('css')">Add CSS Block</button>
-
+  <button onclick="addBlock('css')">
+   Add CSS Block
+  </button>
   <select id="blockSelector-js">
-    <option value="">--Select a JS Block--</option>
-    <option value="OnProgramStart|Statement|js">OnProgramStart</option>
-    <option value="If|Condition|js">If</option>
-    <option value="Else|Condition|js">Else</option>
-    <option value="ThenDo|Statement|js">ThenDo</option>
-    <option value="PrintToConsole|Action|js">PrintToConsole</option>
+   <option value="">
+    --Select a JS Block--
+   </option>
+   <option value="OnProgramStart|Statement|js">
+    OnProgramStart
+   </option>
+   <option value="If|Condition|js">
+    If
+   </option>
+   <option value="Else|Condition|js">
+    Else
+   </option>
+   <option value="ThenDo|Statement|js">
+    ThenDo
+   </option>
+   <option value="PrintToConsole|Action|js">
+    PrintToConsole
+   </option>
   </select>
-  <button onclick="addBlock('js')">Add JS Block</button>
-
+  <button onclick="addBlock('js')">
+   Add JS Block
+  </button>
   <select id="customBlockType">
-    <option value="">--Custom Block Type--</option>
-    <option value="html">HTML</option>
-    <option value="css">CSS</option>
-    <option value="js">JavaScript</option>
+   <option value="">
+    --Custom Block Type--
+   </option>
+   <option value="html">
+    HTML
+   </option>
+   <option value="css">
+    CSS
+   </option>
+   <option value="js">
+    JavaScript
+   </option>
+   <option value="blueprint">
+    Blueprint
+   </option>
   </select>
-  <button onclick="addCustomBlock()">Add Custom Block</button>
-  
+  <button onclick="addCustomBlock()">
+   Add Custom Block
+  </button>
   <div id="sections">
-    <div id="grid-html">HTML</div>
-    <div id="grid-css">CSS</div>
-    <div id="grid-js">JavaScript</div>
+   <div id="grid-html">
+    HTML
+   </div>
+   <div id="grid-css">
+    CSS
+   </div>
+   <div id="grid-js">
+    JavaScript
+   </div>
+   <div id="grid-blueprint" style="display:none;">
+    <iframe allowfullscreen="" scrolling="no" src="https://blueprintue.com/render/pae8q_5t/">
+    </iframe>
+   </div>
   </div>
-
-  <button onclick="generateCode()">Generate Code</button>
-  <button onclick="previewCode()">Preview Code</button>
-  <button onclick="sendToJSFiddle()">Send to JSFiddle</button>
+  <button onclick="generateCode()">
+   Generate Code
+  </button>
+  <button onclick="previewCode()">
+   Preview Code
+  </button>
+  <button onclick="sendToJSFiddle()">
+   Send to JSFiddle
+  </button>
   <pre id="codeOutput"></pre>
-  <iframe id="iframePreview" style="width:100%;height:400px;"></iframe>
-
+  <iframe id="iframePreview" style="width:100%;height:400px;">
+  </iframe>
   <script>
-    let blockId = 0;
+   let blockId = 0;
 
     function addBlock(section) {
   const selected = document.getElementById('blockSelector-' + section).value;
@@ -244,6 +303,26 @@
       document.getElementById('codeOutput').textContent = code;
     }
   </script>
+  <script>
+   // Assuming existing code for HTML, CSS, and JS is here
+// ...
 
-</body>
+// Add functionality for Blueprint
+function updateBlueprintDisplay() {
+  var selectedType = document.getElementById("customBlockType").value;
+  var blueprintDiv = document.getElementById("grid-blueprint");
+  if (selectedType === "blueprint") {
+    blueprintDiv.style.display = "block";
+  } else {
+    blueprintDiv.style.display = "none";
+  }
+}
+
+// Call the new function whenever the option changes
+document.getElementById("customBlockType").addEventListener("change", updateBlueprintDisplay);
+
+// Initialize once
+updateBlueprintDisplay();
+  </script>
+ </body>
 </html>
