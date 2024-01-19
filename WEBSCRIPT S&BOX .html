@@ -6,7 +6,7 @@
     body {
       margin: 0;
       padding: 20px;
-      zoom: 50%; /* Set the default zoom level to 50% */
+      zoom: 44%; /* Set the default zoom level to 25% */
     }
 
     .container {
@@ -128,7 +128,7 @@
   </style>
 </head>
 <body>
-  <header9999 class="header9999">|Web-Script SandBox v1|</header9999>
+  <header9999 class="header9999">|Web-Script SandBox v3.4 Pre-Alpha|</header9999>
   <div class="container">
     <textarea id="codeInput" class="code-input" rows="5" cols="50"></textarea>
     <div id="sandbox" class="output"></div>
@@ -140,6 +140,7 @@
     <button onclick="saveInputText()">Save Input as Text</button>
     <button onclick="saveOutputHTML()">Save Output as HTML</button>
     <button onclick="sendToJSFiddle()">Send to JSFiddle</button>
+    <button onclick="startJdoodleEditor()">Initialize C++ Compiler/Editor & Interpreter</button> <!-- New Button -->
     <button onclick="openBitoFrame()">Open Bito AI</button>
     <button onclick="changeTheme()">Theme</button>
     <label><input type="checkbox" onclick="toggleDarkMode()">Dark Mode</label>
@@ -157,6 +158,9 @@
     <iframe id="bitoFrame"></iframe>
     <div class="drag-handle" onmousedown="startDrag(event)"></div>
   </div>  
+
+  <div data-pym-src="https://www.jdoodle.com/plugin" data-language="cpp" data-version-index="3" data-libs=""></div>
+  <script src="https://www.jdoodle.com/assets/jdoodle-pym.min.js" type="text/javascript"></script>
 
   <script>
 
@@ -224,20 +228,24 @@
       document.getElementById('jsfiddleForm').submit();
     }
 
-    function sendToJSFiddle() {
-  var output = document.getElementById('sandbox').innerHTML;
-  var codeInput = document.getElementById('codeInput').value;
+    function startJdoodleEditor() {
+      var jdoodleContainer = document.querySelector('[data-pym-src="https://www.jdoodle.com/plugin"]');
+      jdoodleContainer.innerHTML = ''; // Clear existing content
+      var newJdoodleContainer = document.createElement('div');
+      newJdoodleContainer.setAttribute('data-pym-src', 'https://www.jdoodle.com/plugin');
+      newJdoodleContainer.setAttribute('data-language', 'cpp');
+      newJdoodleContainer.setAttribute('data-version-index', '3');
+      newJdoodleContainer.setAttribute('data-libs', '');
+      jdoodleContainer.appendChild(newJdoodleContainer);
 
-  if (output.trim() === '') {
-    document.getElementById('jsfiddleHtml').value = codeInput;
-  } else {
-    document.getElementById('jsfiddleHtml').value = output;
-  }
+      // Load the JDoodle C++ editor
+      var script = document.createElement('script');
+      script.src = 'https://www.jdoodle.com/assets/jdoodle-pym.min.js';
+      script.type = 'text/javascript';
+      document.head.appendChild(script);
+    }
 
-  document.getElementById('jsfiddleForm').submit();
-}
-
-function openBitoFrame() {
+    function openBitoFrame() {
       bitoFrameContainer.style.display = 'block';
       bitoFrame.src = 'https://alpha.bito.co/bitoai/';
     }
@@ -248,35 +256,35 @@ function openBitoFrame() {
     }
 
     function startDrag(event) {
-  event.preventDefault();
+      event.preventDefault();
 
-  var offsetX = event.clientX - bitoFrameContainer.offsetLeft;
-  var offsetY = event.clientY - bitoFrameContainer.offsetTop;
+      var offsetX = event.clientX - bitoFrameContainer.offsetLeft;
+      var offsetY = event.clientY - bitoFrameContainer.offsetTop;
 
-  document.onmousemove = function (event) {
-    if (event.buttons !== 1) return; // Only drag when the left mouse button is held
+      document.onmousemove = function (event) {
+        if (event.buttons !== 1) return; // Only drag when the left mouse button is held
 
-    var x = event.clientX - offsetX;
-    var y = event.clientY - offsetY;
+        var x = event.clientX - offsetX;
+        var y = event.clientY - offsetY;
 
-    bitoFrameContainer.style.left = x + 'px';
-    bitoFrameContainer.style.top = y + 'px';
-  };
+        bitoFrameContainer.style.left = x + 'px';
+        bitoFrameContainer.style.top = y + 'px';
+      };
 
-  document.onmouseup = function () {
-    document.onmousemove = null;
-    document.onmouseup = null;
-  };
-}
+      document.onmouseup = function () {
+        document.onmousemove = null;
+        document.onmouseup = null;
+      };
+    }
 
-function changeTheme() {
-  var imageUrl = prompt("Try this theme https://gcdnb.pbrd.co/images/TDIkPmbJugHn.jpg?o=1 Now Otherwise Create and upload & or Enter the URL of the background image to change the theme:");
-  if (imageUrl) {
-    document.body.style.backgroundImage = 'url(' + imageUrl + ')';
-  } else {
-    document.body.style.backgroundImage = 'url(https://gcdnb.pbrd.co/images/TDIkPmbJugHn.jpg?o=1)';
-  }
-}
+    function changeTheme() {
+      var imageUrl = prompt("Try this theme https://gcdnb.pbrd.co/images/TDIkPmbJugHn.jpg?o=1 Now Otherwise Create and upload & or Enter the URL of the background image to change the theme:");
+      if (imageUrl) {
+        document.body.style.backgroundImage = 'url(' + imageUrl + ')';
+      } else {
+        document.body.style.backgroundImage = 'url(https://gcdnb.pbrd.co/images/TDIkPmbJugHn.jpg?o=1)';
+      }
+    }
 
     function toggleDarkMode() {
       document.body.classList.toggle('dark-mode');
