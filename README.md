@@ -17,4 +17,4 @@ This project is a work in progress, with continuous updates and enhancements bei
 ### Enjoy your coding journey with the Web Script Editor!
 ## TO Dowload Follow the Link to our Last Version below
 
-###(https://progressivegamedesign.itch.io/webscript-unlimited-editor)
+# (https://progressivegamedesign.itch.io/webscript-unlimited-editor)
